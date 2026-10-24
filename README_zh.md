@@ -31,6 +31,8 @@
 
 Coopanion 是一个桌宠。桌宠 **Coo** 待在屏幕底边，可以用气泡和你聊天、听你说话、在底边走动，经你同意后还能操作电脑。支持 Windows、macOS 和 Linux。
 
+此本地源码副本包含可选 Codex 任务监控装配，依赖相邻的监控项目，可不调用模型显示本地任务提醒。安装方法见 `../coo-codex-monitor/docs/WINDOWS.md`；这不是上游正式发布功能。
+
 **语言**：应用和新手引导有简体中文、繁體中文、English、日本語、한국어、Français、Deutsch、Español (Latinoamérica)、Português (Brasil)、Italiano、Русский 11 种语言。新装时跟随系统语言，系统语言不在其中时用英文；从旧版本升级的保留原来的语言。在「习惯」页的「语言」里修改。Coo 用应用语言和你说话。
 
 ![1790222143546](image/README/1790222143546.png)

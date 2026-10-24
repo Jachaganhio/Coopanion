@@ -39,6 +39,8 @@ Coopanion is a desktop pet. **Coo** lives on the bottom edge of your screen: it 
 
 ## Features
 
+This local source checkout includes an optional Codex task monitor assembly. See `../coo-codex-monitor/docs/WINDOWS.md`; it requires the sibling monitor project and can display local task notices without model calls. This is not an upstream release feature.
+
 - **Many model services**: OpenAI, Anthropic, Gemini, xAI, OpenRouter, DeepSeek, Kimi, Qwen, MiniMax, Zhipu GLM, Doubao, Baidu Qianfan and StepFun. Pick one and paste an API key, or sign in with a ChatGPT account to use its ChatGPT plan.
 - **Chat**: hold the talk key and speak, or type; Coo answers in a bubble. Speech is recognized on your machine with FunASR or Whisper, picked by the app language.
 - **Memory**: Coo remembers what you talked about, and knows when you poke it or pat its head. What it knows about you goes in `PARTNER.md` in its workspace, which its prompt includes whole. Every change to the workspace is kept as a version; the Memory page in the advanced mode shows the history. The Windows build carries git; on macOS and Linux git has to be installed.
