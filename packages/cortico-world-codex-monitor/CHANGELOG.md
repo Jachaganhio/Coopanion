@@ -1,5 +1,12 @@
 # Changelog (`package.json`)
 
+## 0.2.1
+
+- Show one plain-text notification sentence within 50 Unicode characters, including the source name.
+- Remove Markdown, tables, code fences, citations and presentation directives from notifications.
+- Preserve negative verification in brief summaries and reformat older stored excerpts on delivery.
+- Supply the same concise sentence to model notifications; retain full local answers separately.
+
 ## 0.2.0
 
 - Collect local Codex Desktop and Claude Desktop Code task states inside the World lifecycle.

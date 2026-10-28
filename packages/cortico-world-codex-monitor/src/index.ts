@@ -1,3 +1,4 @@
+import { notificationSentence, summarizeAnswer } from './engine/summary.ts';
 import { strings } from './strings.ts';
 import { taskNotice } from './model-text.ts';
 import { LocalClient } from './local.ts';
@@ -39,11 +40,9 @@ export class MonitorWorld {
   async deliver(e:Entry,host:Host):Promise<boolean>{
     const ui=strings(),event=e.value.event;
     if(!['started','completed','needs_attention','cancelled','failed'].includes(event) || event==='started'&&!this.cfg.notifyStarted)return true;
-    const source=e.value.source==='claude'?'Claude Code':'Codex';
-    let text=`${source}: ${ui.statuses[event]}`;
-    if(event==='completed')text+=`\n${ui.excerpt}: ${e.value.summary || ui.statuses.unknown}`;
+    const text=notificationSentence(e.value.source,event==='completed'?(e.value.finalAnswer||e.value.summary):undefined,ui.statuses[event]);
     if(this.sink){if(!this.sink.ready())return false;return this.sink.show(text);}
-    if(this.cfg.mode==='model')await host.pushEvent({type:'codex-monitor.notice',ts:e.value.timestamp,source:this.id,senderKey:e.value.sessionId,text:taskNotice(e.value.source,event,e.value.taskId,e.value.summary)});
+    if(this.cfg.mode==='model')await host.pushEvent({type:'codex-monitor.notice',ts:e.value.timestamp,source:this.id,senderKey:e.value.sessionId,text:taskNotice(e.value.source,event,e.value.taskId,undefined,text)});
     return true;
   }
   async start(host:Host){
@@ -58,7 +57,7 @@ export class MonitorWorld {
         if(this.cfg.notifyConnected && !this.greeted && this.client.online && ready){
           this.greeted=true;this.greetingState='displaying';
           writeJson(this.healthFile,{bridgeOnline:true,bubblesConfigured:true,bubblesReady:ready,greeting:this.greetingState,observedAt:new Date().toISOString()});
-          const shown=await this.sink!.show(`${strings().greeting}: Codex / Claude Code`,{acknowledge:strings().ok});
+          const shown=await this.sink!.show(summarizeAnswer(`${strings().greeting}: Codex / Claude Code`),{acknowledge:strings().ok});
           this.greetingState=shown?'delivered':'unavailable';
           if(!shown)this.greeted=false;
         }

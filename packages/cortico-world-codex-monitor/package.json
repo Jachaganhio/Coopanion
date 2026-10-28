@@ -1,6 +1,6 @@
 {
   "name": "cortico-world-codex-monitor",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "license": "MIT",
   "description": "Self-contained Codex and Claude Code Desktop task monitoring World",

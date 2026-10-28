@@ -10,6 +10,9 @@ This fork already bundles the same World, disabled by default. Enable it in Worl
 
 ## Notifications and data
 
+Direct bubble notifications contain one plain-text sentence of at most 50 Unicode characters, including the source name. Markdown and citation metadata are removed; failures and unverified results are retained when present. The full local answer remains available in the task panel. Model notifications request the same brief sentence.
+
+
 The standalone package defaults to `model`: events, including sanitized answer excerpts, go to the configured model, which decides how to notify. This requires a model connection and may consume quota. `status` shows the task list without pushing model events. The task query tool can also place returned task data and answers in model context.
 
 This fork injects a host-owned `BubbleSink` into the bundled World and defaults to `status`, displaying bubbles without model calls. Upstream World API 6 has no public direct pet-notification interface; installing the package in the original app does not add that interface.

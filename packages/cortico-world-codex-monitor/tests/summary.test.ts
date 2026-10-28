@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { extractConclusion } from '../src/engine/summary.ts';
+import { extractConclusion, notificationSentence } from '../src/engine/summary.ts';
 import { State } from '../src/engine/state.ts';
 import { CodexAdapter } from '../src/engine/adapters/codex.ts';
 import { MonitorWorld } from '../src/index.ts';
@@ -34,4 +34,32 @@ test('only explicit completion carries its own answer; historical answers are no
   send('task_complete','other','2026-01-02T00:02:00Z');
   const tasks=state.snapshot().tasks;
   assert.equal(tasks[0].finalAnswer,undefined);assert.match(tasks[1].summary!,/尚未运行/);assert.equal(tasks[2].summary,undefined);
+});
+
+test('completion bubble is one plain sentence within 50 Unicode characters, including source',async()=>{
+  const shown:string[]=[];
+  const world=new MonitorWorld({enabled:true,mode:'status',connectionFile:'',notifyStarted:true},mkdtempSync(join(tmpdir(),'brief-bubble-')),{ready:()=>true,show:async text=>{shown.push(text);return true;}});
+  const event={...makeEvent('s','t','completed',new Date().toISOString(),'rollout',undefined,'claude'),summary:'## **已完成 macOS 适配**\n\n- 修改了 [启动入口](/tmp/project/main.ts) 和 `World` 配置。\n- **测试失败，尚未完成验收。**'};
+  await world.deliver({seq:1,id:'brief',notify:true,value:event},{pushEvent:async()=>{throw new Error('No model calls');}});
+  assert.ok(Array.from(shown[0]).length<=50,shown[0]);
+  assert.doesNotMatch(shown[0],/[\n\r#*`]|\]\(|答复摘录/);
+  assert.match(shown[0],/测试失败/);
+  assert.equal((shown[0].match(/[。！？!?]/g)||[]).length,1);
+});
+
+test('summary strips tables, citations, code fences, links and presentation tags',()=>{
+  const result=extractConclusion('## 实施结果\n\n**已修复** [登录问题](/tmp/project/login(test).ts)。\n\n| 检查 | 结果 |\n| --- | --- |\n| 测试 | 通过 |\n```ts\nconsole.log("do not display");\n```\n<oai-mem-citation>internal reference</oai-mem-citation>\nciteturn0search0\n::code-comment{title="internal"}')!;
+  assert.match(result.summary,/已修复.*登录问题/);
+  assert.ok(Array.from(result.summary).length<=50);
+  assert.doesNotMatch(result.summary,/实施结果|[\n#*`|<>]|turn0search|internal|console|\]\(/);
+  assert.equal((result.summary.match(/[。！？!?]/g)||[]).length,1);
+});
+
+test('same-line negative verification and Unicode text survive the 50-character limit',()=>{
+  const text=notificationSentence('claude','**已完成修改。测试失败，尚未完成。**','');
+  assert.match(text,/测试失败/);assert.ok(Array.from(text).length<=50);
+  const emoji=notificationSentence('codex','👩‍💻'.repeat(30)+'已完成。','');
+  assert.ok(Array.from(emoji).length<=50);
+  assert.doesNotMatch(emoji,/\uFFFD|[\n*`]/);
+  assert.equal((text.match(/[。！？!?]/g)||[]).length,1);
 });
