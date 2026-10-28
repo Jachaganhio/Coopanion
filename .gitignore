@@ -5,3 +5,6 @@ scratch/
 *.log
 promo/assets/bgm.mp3
 packages/cortico-world-desktop-pet/scripts/speech-bank/.cache/
+
+packages/cortico-world-codex-monitor/dist/
+/Coo Monitor.app/

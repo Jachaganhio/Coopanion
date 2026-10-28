@@ -1,0 +1,40 @@
+{
+  "name": "cortico-world-codex-monitor",
+  "version": "0.2.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "Self-contained Codex and Claude Code Desktop task monitoring World",
+  "keywords": [
+    "cortico-world",
+    "cortico",
+    "codex",
+    "local"
+  ],
+  "engines": {
+    "node": ">=22.18"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "describe.json",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "README_zh.md"
+  ],
+  "cortico": {
+    "kind": "world",
+    "api": 6,
+    "tags": [
+      "local"
+    ],
+    "describe": "describe.json",
+    "webUiClient": "dist/webui.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jachaganhio/Coopanion.git",
+    "directory": "packages/cortico-world-codex-monitor"
+  },
+  "homepage": "https://github.com/Jachaganhio/Coopanion/tree/feat/codex-claude-monitor/packages/cortico-world-codex-monitor"
+}

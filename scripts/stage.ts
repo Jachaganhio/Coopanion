@@ -41,6 +41,9 @@ const DROP = new Set([
   'bots/corti-soulmate', 'bots/cortiv',
 ]);
 
+const monitorBuild = spawnSync(process.execPath, ['--import', 'tsx', join(ROOT, 'scripts', 'build-monitor.ts')], { cwd: ROOT, stdio: 'inherit' });
+if (monitorBuild.status !== 0) process.exit(monitorBuild.status ?? 1);
+
 const t0 = Date.now();
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });

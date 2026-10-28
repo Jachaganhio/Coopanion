@@ -1,0 +1,25 @@
+{
+  "tools": [
+    {
+      "name": "codex_tasks",
+      "description": "Read observed local Codex and Claude Code task states.",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "tags": [
+        "read"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "codex-monitor.notice",
+      "description": {
+        "en": "An observed Codex or Claude Code task transition.",
+        "zh": "明确观察到的 Codex 或 Claude Code 任务变化。"
+      }
+    }
+  ]
+}

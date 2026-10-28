@@ -2,6 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": { "lib": ["ES2022", "DOM", "DOM.Iterable"] },
   "include": [
+    "packages/cortico-world-codex-monitor/src/**/*.ts",
+    "packages/cortico-world-codex-monitor/tests/**/*.ts",
     "packages/cortico-world-desktop-pet/src/**/*.ts",
     "packages/cortico-world-desktop-pet/tests/**/*.ts"
   ],

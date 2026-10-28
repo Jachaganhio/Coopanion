@@ -274,4 +274,4 @@ Coopanion 用 [Cortico](https://github.com/Pal-AI-Lab/Cortico) 组装：Cortico 
 
 DeepSeek 大肥鱼形象（`packages/cortico-world-desktop-pet/web/whale/` 的贴图）不在 AGPL 授权范围内，来源与各家标志的说明见[桌宠 World 的第三方声明](packages/cortico-world-desktop-pet/THIRD_PARTY_NOTICES.md)。随附或运行时下载的第三方组件：Electron（MIT）、Cortico（MIT）、sherpa-onnx（Apache-2.0）、FunASR 的 SenseVoiceSmall 模型（[FunASR 模型开源协议](https://github.com/modelscope/FunASR/blob/main/MODEL_LICENSE)，用时下载）、OpenAI 的 Whisper small 模型（MIT，用时下载）、koffi（MIT）、jpeg-js（BSD-3-Clause）、pnpm（MIT）；各家模型服务的标志取自 [lobe-icons](https://github.com/lobehub/lobe-icons)（MIT，标志归各自公司所有，只用于标明服务）。
 
-可选的本机 Codex / Claude Code 任务监控通过相邻 `coo-codex-monitor` World 装配；独立插件与可选零模型气泡接入说明见该项目。
+本 fork 内置可选的 [Codex / Claude Code 任务监控 World](packages/cortico-world-codex-monitor/README_zh.md)。在 World 列表启用 `codex-monitor` 即可采集本机任务并显示提醒。独立插件包通过 `pnpm run pack:monitor` 构建。

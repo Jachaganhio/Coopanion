@@ -24,7 +24,11 @@
     "typecheck": "tsc --noEmit",
     "typecheck:web": "tsc -p tsconfig.web.json",
     "test:worlds": "vitest run --config vitest.worlds.config.ts",
-    "typecheck:worlds": "tsc -p tsconfig.worlds.json"
+    "typecheck:worlds": "tsc -p tsconfig.worlds.json",
+    "build:monitor": "tsx scripts/build-monitor.ts",
+    "pack:monitor": "tsx scripts/pack-monitor.ts",
+    "start:monitor": "tsx scripts/start-monitor.ts",
+    "create:monitor-app": "tsx scripts/create-monitor-app.ts"
   },
   "dependencies": {
     "cortico-provider-coo": "workspace:*",
@@ -34,7 +38,8 @@
     "pnpm": "11.28.6",
     "tsx": "^4.23.15",
     "undici": "7.29.1",
-    "ws": "^8.21.3"
+    "ws": "^8.21.3",
+    "cortico-world-codex-monitor": "workspace:*"
   },
   "devDependencies": {
     "@codemirror/commands": "^6.11.1",

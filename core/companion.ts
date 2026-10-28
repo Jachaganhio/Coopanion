@@ -1,4 +1,4 @@
-import { createMonitorDefinition } from "../../coo-codex-monitor/packages/coopanion-world/src/index.ts";
+import { createMonitorDefinition } from 'cortico-world-codex-monitor';
 /**
  * The app's Core process: Cormini as the Persona, the console, desktop-pet and coopanion Worlds, Coo Pet
  * Provider (DeepSeek and the other model services Coo offers) and its `chatgpt` module (a ChatGPT plan,
@@ -555,9 +555,9 @@ export async function main(): Promise<void> {
     reservedProviders: [...providerModules.map((m) => m.id), COO.id, CHATGPT_PROVIDER.id],
   });
   registerProviderModules([COO, CHATGPT_PROVIDER, ...extensions.providers]);
-  extensions.webUiAssets.push(...appWebUiAsset(MONITOR.id, fileURLToPath(new URL("../../coo-codex-monitor/packages/coopanion-world/src/", import.meta.url)), '0.2.0'));
   extensions.webUiAssets.push(...bundledWebUiAssets([
     { id: DESKTOP_PET.id, packageName: 'cortico-world-desktop-pet' },
+    { id: MONITOR.id, packageName: 'cortico-world-codex-monitor' },
   ]), ...appWebUiAsset(NOTICE_ID, join(APP_ROOT, 'build', 'panels', 'coopanion'), APP_VERSION));
   const definition = withWorlds(definitionBase, [...bundled, ...extensions.worlds]);
 

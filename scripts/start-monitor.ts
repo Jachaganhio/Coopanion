@@ -1,0 +1,20 @@
+/** Starts this checkout's Electron with task-monitor development data under scratch/. */
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { join, resolve } from 'node:path';
+import { spawn } from 'node:child_process';
+const root=fileURLToPath(new URL('../',import.meta.url));
+const data=resolve(process.env.CORTICO_COMPANION_DATA || join(root,'scratch','task-monitor-data'));
+const file=join(data,'home','companion','config.json');
+mkdirSync(join(data,'home','companion'),{recursive:true});
+const config=existsSync(file)?JSON.parse(readFileSync(file,'utf8')):{};
+config.worlds??={};
+config.worlds['codex-monitor']??={enabled:true,collection:'local',mode:'status',notifyStarted:true,notifyConnected:true};
+config.companion??={};config.companion.telemetry=false;
+writeFileSync(file,JSON.stringify(config,null,2)+'\n',{mode:0o600});
+if(!existsSync(join(root,'build','console','index.html')) || !existsSync(join(root,'packages','cortico-world-codex-monitor','dist','index.js')))throw new Error('Run pnpm run build:cortico first.');
+const env:NodeJS.ProcessEnv={...process.env,CORTICO_COMPANION_DATA:data};delete env.ELECTRON_RUN_AS_NODE;
+const child=spawn(process.execPath,[join(root,'node_modules','electron','cli.js'),'.'],{cwd:root,env,stdio:'inherit'});
+child.on('error',error=>{console.error(error.message);process.exitCode=1;});
+for(const signal of ['SIGINT','SIGTERM'] as const)process.on(signal,()=>child.kill(signal));
+child.on('exit',(code,signal)=>{process.exitCode=code??(signal?1:0);});
