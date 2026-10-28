@@ -28,6 +28,8 @@ export class ClaudeAdapter extends JsonlAdapter {
     if(!c.sessionId || c.sessionId!==r.sessionId || !c.taskId)return;
     if(r.type==='assistant') {
       c.claudeEndTurn=r.message?.stop_reason==='end_turn';
+      c.claudeLastAssistantId=c.claudeEndTurn && typeof r.uuid==='string'?r.uuid:undefined;
+      c.claudeLastAssistantAt=c.claudeEndTurn?r.timestamp:undefined;
       delete c.claudeAnswer;
       if(c.claudeEndTurn && !historical && Array.isArray(content)) {
         const text=content.filter((b:any)=>b?.type==='text' && typeof b.text==='string').map((b:any)=>b.text).join('\n');
@@ -44,7 +46,7 @@ export class ClaudeAdapter extends JsonlAdapter {
     }
     if(toolResult)event='running';
     if(!event)return;
-    const e=makeEvent(c.sessionId,c.taskId,historical && ['started','running','needs_attention'].includes(event)?'unknown':event,r.timestamp,'rollout',c.project,'claude');
+    const e=makeEvent(c.sessionId,c.taskId,historical && ['started','running','needs_attention'].includes(event)?'unknown':event,r.timestamp,'rollout',this.includeProjects?c.project:undefined,'claude');
     if(event==='completed') {
       if(!historical)Object.assign(e,c.claudeAnswer);
       delete c.claudeAnswer;c.claudeEndTurn=false;

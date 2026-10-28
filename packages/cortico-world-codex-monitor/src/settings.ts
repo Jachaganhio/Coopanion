@@ -8,6 +8,7 @@ export function settings(){const ui=strings();return [{
       'worlds.codex-monitor.notifyConnected':{type:'boolean' as const,title:ui.fields[2]},
       'worlds.codex-monitor.includeProjects':{type:'boolean' as const,title:ui.fields[3],'x-hot':false},
       'worlds.codex-monitor.codexHome':{type:'string' as const,title:ui.fields[4],'x-hot':false,'x-path':{kind:'directory' as const}},
+      'worlds.codex-monitor.claudeDesktopHome':{type:'string' as const,title:'Claude Desktop','x-hot':false,'x-path':{kind:'directory' as const}},
       'worlds.codex-monitor.claudeHome':{type:'string' as const,title:ui.fields[5],'x-hot':false,'x-path':{kind:'directory' as const}},
     }
   }

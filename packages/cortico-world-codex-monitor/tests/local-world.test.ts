@@ -48,3 +48,35 @@ test('local collector discovers Claude Desktop logs without an HTTP server',asyn
  assert.equal(client.snapshot.tasks[0]?.event,'completed');assert.equal(client.snapshot.tasks[0]?.source,'claude');
  assert.ok(sent.some(e=>e.value.event==='completed'));client.stop();
 });
+
+test('live events written after activation but before the first poll are delivered',async t=>{
+ const dir=mkdtempSync(join(tmpdir(),'coo-activation-'));t.onTestFinished(()=>rmSync(dir,{recursive:true,force:true}));
+ const codexHome=join(dir,'codex');mkdirSync(join(codexHome,'sessions'),{recursive:true});
+ const client=new LocalClient(join(dir,'data'),{codexHome,claudeHome:join(dir,'claude')});client.start();
+ const stamp=new Date(Date.now()+1).toISOString();
+ appendFileSync(join(codexHome,'sessions/live.jsonl'),[
+ {type:'session_meta',payload:{id:'live',originator:'Codex Desktop',source:'vscode',thread_source:'user'}},
+ {type:'event_msg',timestamp:stamp,payload:{type:'task_started',turn_id:'live'}},
+ {type:'event_msg',timestamp:stamp,payload:{type:'task_complete',turn_id:'live'}},
+ ].map(line).join(''));
+ const delivered:string[]=[];await client.poll(async entry=>{delivered.push(entry.value.event);return true;});
+ assert.deepEqual(delivered,['started','completed']);client.stop();
+});
+
+test('turning project names off removes cached labels and keeps future events private',async t=>{
+ const dir=mkdtempSync(join(tmpdir(),'coo-project-toggle-'));t.onTestFinished(()=>rmSync(dir,{recursive:true,force:true}));
+ const codexHome=join(dir,'codex');mkdirSync(join(codexHome,'sessions'),{recursive:true});
+ const options={codexHome,claudeHome:join(dir,'claude')};
+ const first=new LocalClient(join(dir,'data'),{...options,includeProjects:true});first.start();await first.poll(async()=>true);
+ const file=join(codexHome,'sessions/project.jsonl');
+ const event=(type:string,id:string)=>line({type:'event_msg',timestamp:new Date(Date.now()+1).toISOString(),payload:{type,turn_id:id}});
+ appendFileSync(file,line({type:'session_meta',payload:{id:'project',originator:'Codex Desktop',source:'vscode',thread_source:'user',cwd:'/private/hidden-project'}})+event('task_started','first')+event('task_complete','first'));
+ await first.poll(async()=>true);assert.equal(first.snapshot.tasks[0].project,'hidden-project');first.stop();
+ const hidden=new LocalClient(join(dir,'data'),{...options,includeProjects:false});hidden.start();
+ appendFileSync(file,event('task_started','hidden'));await hidden.poll(async()=>true);
+ assert.ok(hidden.snapshot.tasks.every(task=>task.project===undefined));
+ assert.ok(hidden.state.data.entries.every(entry=>entry.value.project===undefined));hidden.stop();
+ const restored=new LocalClient(join(dir,'data'),{...options,includeProjects:true});restored.start();
+ appendFileSync(file,event('task_started','restored'));await restored.poll(async()=>true);
+ assert.equal(restored.snapshot.tasks.find(task=>task.taskId==='restored')?.project,'hidden-project');restored.stop();
+});

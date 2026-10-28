@@ -63,3 +63,19 @@ test('same-line negative verification and Unicode text survive the 50-character 
   assert.doesNotMatch(emoji,/\uFFFD|[\n*`]/);
   assert.equal((text.match(/[。！？!?]/g)||[]).length,1);
 });
+
+test('a late or heading-only failure cannot be truncated into an affirmative notification',()=>{
+  const long=notificationSentence('codex','已完成'+'功能调整'.repeat(15)+'，但测试失败。','轮次结束');
+  assert.match(long,/测试失败/);assert.ok(Array.from(long).length<=50);
+  assert.match(notificationSentence('codex','已完成'+'功能调整'.repeat(15)+'测试失败。','轮次结束'),/测试失败/);
+  const heading=notificationSentence('codex','## 测试失败，尚未完成验收','轮次结束');
+  assert.match(heading,/测试失败/);
+});
+
+test('model mode uses model events even when a native bubble sink is available',async()=>{
+  let bubbles=0,modelEvents=0;
+  const world=new MonitorWorld({enabled:true,mode:'model',connectionFile:'',notifyStarted:true},mkdtempSync(join(tmpdir(),'model-selection-')),{ready:()=>true,show:async()=>{bubbles++;return true;}});
+  const event=makeEvent('s','t','started',new Date().toISOString(),'rollout');
+  await world.deliver({seq:1,id:'model-selection',notify:true,value:event},{pushEvent:async()=>{modelEvents++;}});
+  assert.equal(modelEvents,1);assert.equal(bubbles,0);
+});

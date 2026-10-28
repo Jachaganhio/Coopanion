@@ -1,3 +1,4 @@
+import { ClaudeDesktopCompletion } from '../src/engine/adapters/claude-desktop.ts';
 import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, appendFileSync, readFileSync, rmSync } from 'node:fs';
@@ -88,4 +89,21 @@ test('Claude Stop feedback and injected continuation cannot produce premature co
   x.append(answer(),{...user('hook-feedback'),isMeta:true},done());await x.adapter.poll();
   assert.equal(Object.values(x.state.data.tasks)[0].event,'running');
   x.append(answer(),done());await x.adapter.poll();assert.equal(Object.values(x.state.data.tasks)[0].event,'completed');
+});
+
+test('Desktop completed-turn metadata confirms a matching final answer without Stop hooks',async t=>{
+  const x=fixture(t);x.append(user(),{...answer(),uuid:'last-answer'});await x.adapter.poll();
+  assert.equal(Object.values(x.state.data.tasks)[0].event,'running');
+  const metadata=join(x.dir,'desktop');mkdirSync(metadata);
+  const file=join(metadata,'session.json'),completion=new ClaudeDesktopCompletion(metadata,x.state);
+  const record={cliSessionId:'session',completedTurns:1,lastAssistantUuid:'last-answer',postTurnSummaryFor:'stale-answer',title:'PRIVATE TITLE'};
+  writeFileSync(file,JSON.stringify(record));await completion.poll();
+  assert.equal(Object.values(x.state.data.tasks)[0].event,'running');
+  writeFileSync(file,JSON.stringify({...record,postTurnSummaryFor:'last-answer',completedTurns:0}));await completion.poll();
+  assert.equal(Object.values(x.state.data.tasks)[0].event,'running');
+  writeFileSync(file,JSON.stringify({...record,postTurnSummaryFor:'last-answer'}));await completion.poll();
+  assert.equal(Object.values(x.state.data.tasks)[0].event,'completed');
+  assert.equal(Object.values(x.state.data.tasks)[0].evidence,'desktop');
+  const seq=x.state.data.seq;await completion.poll();assert.equal(x.state.data.seq,seq);
+  assert.ok(!readFileSync(x.state.file,'utf8').includes('PRIVATE TITLE'));
 });

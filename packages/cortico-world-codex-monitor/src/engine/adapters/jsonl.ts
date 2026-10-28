@@ -5,10 +5,10 @@ import { State, type Cursor } from '../state.ts';
 import type { TaskAdapter } from './types.ts';
 const MAX_LINE=4*1024*1024;
 const hash=(b:Buffer)=>createHash('sha256').update(b).digest('hex');
-export async function filesUnder(dir:string):Promise<string[]> {
+export async function filesUnder(dir:string,extension='.jsonl'):Promise<string[]> {
   let entries;try{entries=await readdir(dir,{withFileTypes:true});}catch(e){if((e as NodeJS.ErrnoException).code==='ENOENT')return [];throw e;}
   const result:string[]=[];
-  for(const e of entries) {if(e.isDirectory())result.push(...await filesUnder(join(dir,e.name)));else if(e.isFile()&&e.name.endsWith('.jsonl'))result.push(join(dir,e.name));}
+  for(const e of entries) {if(e.isDirectory())result.push(...await filesUnder(join(dir,e.name),extension));else if(e.isFile()&&e.name.endsWith(extension))result.push(join(dir,e.name));}
   return result.sort();
 }
 export abstract class JsonlAdapter implements TaskAdapter {
@@ -23,11 +23,13 @@ export abstract class JsonlAdapter implements TaskAdapter {
     }
     this.state.save();
   }
+  protected reusableCursor(_cursor:Cursor):boolean{return true;}
   private async read(file:string,baseline:string) {
     const f=await open(file,'r');
     try {
       const s=await f.stat();const identity=`${s.dev}:${s.ino}:${s.birthtimeMs}`;
       let c:Cursor|undefined=this.state.data.cursors[file];
+      if(c && !this.reusableCursor(c))c=undefined;
       if(c && c.offset>0){const b=Buffer.alloc(Math.min(128,c.offset));await f.read(b,0,b.length,c.offset-b.length);if(c.anchor!==hash(b))c=undefined;}
       if(!c || c.identity!==identity || s.size<c.offset)c={offset:0,identity,anchor:''};
       this.state.data.cursors[file]=c;

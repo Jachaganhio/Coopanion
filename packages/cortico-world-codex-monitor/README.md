@@ -21,7 +21,7 @@ The settings group controls notification mode, start notices, project names and 
 
 The collector reads session logs only. It stores task metadata and truncated, sanitized answers from new completed turns; it does not store prompts or tool arguments and does not read authentication files. Credential redaction is best effort. First activation and reactivation silently import historical state without storing historical answers.
 
-Only local main sessions are supported. Claude coverage is the Desktop Code tab, not chat, Cowork, cloud or SSH sessions. Completion means an explicit turn end, not verified code quality. Permission dialogs and interrupts without a corresponding log event cannot be inferred.
+Only directly initiated local main sessions are supported; subagent files and internally attributed turns are excluded even when they contain copied parent history. Claude coverage is the Desktop Code tab, not chat, Cowork, cloud or SSH sessions. Completion means an explicit turn end, not verified code quality. Claude completion requires either a clean Stop summary or a successful-turn Desktop session record whose last assistant UUID and post-turn result pointer both match the transcript. Missing or stale metadata remains unconfirmed. The default Desktop metadata root is the system application-data directory for Claude; `claudeDesktopHome` can override it. A custom Claude log root needs an explicit Desktop metadata root for that fallback. Permission dialogs and interrupts without a corresponding log event cannot be inferred.
 
 ## Build and distribution
 

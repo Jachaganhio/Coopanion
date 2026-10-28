@@ -1,5 +1,13 @@
 # Changelog (`package.json`)
 
+## 0.2.2
+
+- Pin Codex rollout ownership to the first session header and exclude internally attributed turns, including copied parent history in subagent logs.
+- Rescan legacy cursors and remove misattributed internal task notifications.
+- Deliver live events collected during activation instead of silently baselining them away.
+- Confirm Claude completion through matching Desktop result metadata when Stop hooks are absent.
+- Honor model mode with a host bubble sink and preserve late or heading-only failure statements in short notices.
+
 ## 0.2.1
 
 - Show one plain-text notification sentence within 50 Unicode characters, including the source name.

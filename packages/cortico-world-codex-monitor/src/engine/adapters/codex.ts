@@ -6,12 +6,26 @@ import { JsonlAdapter } from './jsonl.ts';
 export { filesUnder } from './jsonl.ts';
 
 export class CodexAdapter extends JsonlAdapter {
+  protected override reusableCursor(cursor:Cursor){return cursor.codexOwnerPinned===true && cursor.codexProjectNames===this.includeProjects;}
   record(r:any,c:Cursor,baseline:string) {
     const p=r?.payload;if(!p)return;
     if(r.type==='session_meta') {
+      if(c.codexOwnerPinned)return;
+      // A forked rollout embeds parent history after its own authoritative header.
+      c.codexOwnerPinned=true;c.codexProjectNames=this.includeProjects;
       c.desktop=p.originator==='Codex Desktop' && p.source==='vscode' && (!p.thread_source || p.thread_source==='user');
       c.sessionId=p.id;
       if(this.includeProjects && typeof p.cwd==='string')c.project=(p.cwd.includes('\\')?win32.basename(p.cwd):basename(p.cwd)).slice(0,100);
+      return;
+    }
+    const attribution=p.turn_attribution;
+    if(r.type==='event_msg' && typeof p.turn_id==='string' &&
+      (attribution?.parent_turn_id || attribution?.initiating_agent_path ||
+       (p.root_turn_id && p.root_turn_id!==p.turn_id) ||
+       (attribution?.root_turn_id && attribution.root_turn_id!==p.turn_id))) {
+      // Remove notifications persisted by older parsers that reassigned fork ownership.
+      this.state.discardTask('codex',p.turn_id);
+      if(c.taskId===p.turn_id)c.taskId=undefined;
       return;
     }
     if(!c.desktop || !c.sessionId || typeof r.timestamp!=='string')return;
@@ -25,7 +39,7 @@ export class CodexAdapter extends JsonlAdapter {
     if(event && c.taskId) {
       const historical=Date.parse(r.timestamp)<Date.parse(baseline);
       // Historical unfinished tasks have unknown liveness until new explicit evidence arrives.
-      const e=makeEvent(c.sessionId,c.taskId,historical && ['started','running'].includes(event)?'unknown':event,r.timestamp,'rollout',c.project);
+      const e=makeEvent(c.sessionId,c.taskId,historical && ['started','running'].includes(event)?'unknown':event,r.timestamp,'rollout',this.includeProjects?c.project:undefined);
       if(event==='completed' && !historical) Object.assign(e,extractConclusion(p.last_agent_message));
       if(event==='running') {
         const old=this.state.data.tasks[JSON.stringify(['codex',c.sessionId,c.taskId])];

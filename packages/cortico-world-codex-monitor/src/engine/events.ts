@@ -5,7 +5,7 @@ export type EventType = typeof eventTypes[number];
 export interface TaskEvent {
   source: 'codex' | 'claude'; sessionId: string; taskId: string; event: EventType;
   title: string; timestamp: string; detail: string; project?: string;
-  evidence: 'hook' | 'rollout';
+  evidence: 'hook' | 'rollout' | 'desktop';
   summary?: string; finalAnswer?: string;
 }
 export const details = strings().statuses;
@@ -17,7 +17,7 @@ export function eventId(e: TaskEvent): string {
 export function validateEvent(x: unknown): x is TaskEvent {
   if (!x || typeof x !== 'object') return false;
   const e = x as TaskEvent;
-  return ['codex','claude'].includes(e.source) && ['hook','rollout'].includes(e.evidence) && eventTypes.includes(e.event)
+  return ['codex','claude'].includes(e.source) && ['hook','rollout','desktop'].includes(e.evidence) && eventTypes.includes(e.event)
     && [e.sessionId,e.taskId].every(v=>typeof v==='string' && /^[\w.-]{1,160}$/.test(v))
     && typeof e.timestamp==='string' && Number.isFinite(Date.parse(e.timestamp))
     && typeof e.title==='string' && e.title.length<=160 && typeof e.detail==='string' && e.detail.length<=200

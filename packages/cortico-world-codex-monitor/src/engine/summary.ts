@@ -1,6 +1,6 @@
 import { strings } from '../strings.ts';
 
-const risk=/失败|未通过|未完成|尚未|未运行|未验证|待验证|待测试|受阻|fail|not (?:run|test|verif|complete)|pending|blocked/i;
+const risk=/失败|未通过|未完成|尚未|未运行|未验证|未测试|未验收|待验证|待测试|受阻|fail|not (?:yet )?(?:run|test|verif|complete)|pending|blocked/i;
 const segmenter=new Intl.Segmenter(undefined,{granularity:'grapheme'});
 const length=(text:string)=>Array.from(text).length;
 
@@ -27,8 +27,9 @@ function plainLines(input:string):string[] {
     .replace(/<[^>\n]*>/g,'')
     .replace(/&(?:nbsp|amp|lt|gt|quot|#39);/g,entity=>({ '&nbsp;':' ','&amp;':'&','&lt;':'','&gt;':'','&quot;':'"','&#39;':"'" })[entity]||'')
     .split(/\r?\n/)
-    .filter(line=>!/^\s*(?:#{1,6}\s|\||[-*_]{3,}\s*$|\[[^\]]+\]:)/.test(line))
-    .map(line=>line.replace(/^\s*(?:>\s*|[-*+]\s+|\d+[.)]\s+|\[[ xX]\]\s*)+/,'').replace(/[*`~]/g,'').replace(/(^|\W)_+|_+(?=\W|$)/g,'$1').replace(/\s*\|\s*/g,'，').replace(/\s+/g,' ').trim())
+    .filter(line=>!/^\s*(?:\||[-*_]{3,}\s*$|\[[^\]]+\]:)/.test(line))
+    .filter(line=>!/^\s*#{1,6}\s/.test(line) || risk.test(line))
+    .map(line=>line.replace(/^\s*#{1,6}\s+/, '').replace(/^\s*(?:>\s*|[-*+]\s+|\d+[.)]\s+|\[[ xX]\]\s*)+/,'').replace(/[*`~]/g,'').replace(/(^|\W)_+|_+(?=\W|$)/g,'$1').replace(/\s*\|\s*/g,'，').replace(/\s+/g,' ').trim())
     .filter(line=>line && !/^https?:\/\//i.test(line));
 }
 
@@ -42,11 +43,16 @@ export function summarizeAnswer(input:unknown,budget=50):string {
   if(typeof input!=='string' || budget<3)return '';
   const lines=plainLines(input);
   if(!lines.length)return '';
-  const main=clause(lines[0]);
+  let main=clause(lines[0]);
   const clauses=lines.flatMap(line=>line.split(/[。！？!?；;]|\.(?=\s|$)/u)).map(part=>part.trim()).filter(Boolean);
-  const warning=clauses.find(part=>risk.test(part) && !main.includes(part));
+  const warningPart=clauses.flatMap(part=>part.split(/[，,]/u)).find(part=>risk.test(part));
+  const marker=warningPart?.match(risk);
+  const warning=warningPart && marker && length(warningPart)>Math.floor((budget-2)*.6)
+    ? (/\p{Script=Han}/u.test(warningPart)?Array.from(warningPart.slice(0,marker.index)).slice(-2).join(''):'')+warningPart.slice(marker.index)
+    : warningPart;
+  if(warningPart && main.includes(warningPart) && length(main)>budget-1)main=main.replace(warningPart,'').replace(/[，；\s]+$/u,'')||warning||main;
   const verified=clauses.find(part=>/测试(?:已)?通过|验证通过|tests? passed|checks? passed|verified/i.test(part) && !main.includes(part));
-  const secondary=warning || (verified && length(main)+length(verified)+2<=budget ? verified : undefined);
+  const secondary=(warning && !main.includes(warning) ? warning : undefined) || (verified && length(main)+length(verified)+2<=budget ? verified : undefined);
   let text=main;
   if(secondary && !risk.test(main)){
     const note=warning ? warning.split(/[，,]/u).filter(part=>risk.test(part)).map(clause).join('，') : clause(secondary);

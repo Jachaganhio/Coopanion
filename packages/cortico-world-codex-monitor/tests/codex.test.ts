@@ -65,3 +65,20 @@ test('World uses no model by default; bubble sink queues and unavailable sink re
   await world.deliver(entry,host);assert.equal(bubbles,1);assert.equal(modelCalls,0);
   assert.equal(await new MonitorWorld(cfg,x.dir,{ready:()=>false,show:async()=>true}).deliver(entry,host),false);
 });
+
+test('subagent owner stays excluded when its forked history contains parent session metadata',async()=>{
+  const x=setup();await x.adapter.poll();
+  const child=line({type:'session_meta',payload:{id:'child',originator:'Codex Desktop',source:{subagent:{thread_spawn:{parent_thread_id:'s'}}},thread_source:'subagent'}});
+  const childStart=line({type:'event_msg',timestamp:now(),payload:{type:'task_started',turn_id:'review',root_turn_id:'t',turn_attribution:{parent_turn_id:'t',initiating_agent_path:'/root',root_turn_id:'t'}}});
+  writeFileSync(x.file,child+meta()+evt('task_started')+childStart+line({type:'event_msg',timestamp:now(),payload:{type:'task_complete',turn_id:'review',root_turn_id:'t',last_agent_message:'Standards findings'}}));
+  await x.adapter.poll();assert.equal(x.state.data.seq,0);assert.equal(Object.keys(x.state.data.tasks).length,0);
+});
+
+test('upgrade rescans legacy ownership and removes misattributed internal notifications',async()=>{
+  const x=setup();await x.adapter.poll();
+  const child=line({type:'session_meta',payload:{id:'child',originator:'Codex Desktop',source:{subagent:{}},thread_source:'subagent'}});
+  writeFileSync(x.file,child+meta()+line({type:'event_msg',timestamp:now(),payload:{type:'task_started',turn_id:'review',root_turn_id:'t',turn_attribution:{parent_turn_id:'t'}}}));
+  x.state.accept(makeEvent('s','review','started',now(),'rollout'));
+  x.state.data.cursors[x.file]={offset:Buffer.byteLength(readFileSync(x.file)),identity:'legacy',anchor:'',sessionId:'s',desktop:true,taskId:'review'};
+  await x.adapter.poll();assert.equal(Object.keys(x.state.data.tasks).length,0);assert.equal(x.state.data.entries.length,0);
+});

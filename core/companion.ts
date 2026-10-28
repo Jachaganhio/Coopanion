@@ -1,4 +1,3 @@
-import { createMonitorDefinition } from 'cortico-world-codex-monitor';
 /**
  * The app's Core process: Cormini as the Persona, the console, desktop-pet and coopanion Worlds, Coo Pet
  * Provider (DeepSeek and the other model services Coo offers) and its `chatgpt` module (a ChatGPT plan,
@@ -40,6 +39,8 @@ import { createMonitorDefinition } from 'cortico-world-codex-monitor';
  * `{ type: 'companion:locked', pid, file }` when another process holds the data directory, and
  * `{ type: 'companion:ports-busy', from, to }` when every console port Cortico tried could not be listened on.
  */
+import { createMonitorDefinition } from 'cortico-world-codex-monitor';
+
 import { readdirSync } from 'node:fs';
 import { delimiter, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';

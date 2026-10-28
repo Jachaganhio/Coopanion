@@ -2,7 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync, renameSync, existsSync } from '
 import { dirname } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { eventId, validateEvent, type TaskEvent } from './events.ts';
-export interface Cursor {offset:number; identity:string; anchor:string; sessionId?:string; taskId?:string; desktop?:boolean; project?:string; discard?:boolean; claudeEndTurn?:boolean; claudeAnswer?:{summary?:string;finalAnswer?:string}}
+export interface Cursor {offset:number; identity:string; anchor:string; sessionId?:string; taskId?:string; desktop?:boolean;codexOwnerPinned?:boolean;codexProjectNames?:boolean; project?:string; discard?:boolean; claudeEndTurn?:boolean;claudeLastAssistantId?:string;claudeLastAssistantAt?:string; claudeAnswer?:{summary?:string;finalAnswer?:string}}
 export interface Entry {seq:number; id:string; value:TaskEvent; notify:boolean}
 export interface Data {version:1; epoch:string; seq:number; tasks:Record<string,TaskEvent>; seen:Record<string,true>; entries:Entry[]; cursors:Record<string,Cursor>; baseline?:string; claudeBaseline?:string}
 export function atomicWrite(file:string,value:unknown) {
@@ -32,6 +32,10 @@ export class State {
     // Consumer cursors older than this window receive a reset, never a historical alert flood.
     if(this.data.entries.length>2000) this.data.entries.shift();
     return entry;
+  }
+  discardTask(source:TaskEvent['source'],taskId:string){
+    for(const [key,task] of Object.entries(this.data.tasks))if(task.source===source && task.taskId===taskId)delete this.data.tasks[key];
+    this.data.entries=this.data.entries.filter(entry=>entry.value.source!==source || entry.value.taskId!==taskId);
   }
   snapshot(){return {epoch:this.data.epoch,seq:this.data.seq,tasks:Object.values(this.data.tasks)};}
 }
