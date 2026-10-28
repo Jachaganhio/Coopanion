@@ -1,3 +1,4 @@
+import { createMonitorDefinition } from "../../coo-codex-monitor/packages/coopanion-world/src/index.ts";
 /**
  * The app's Core process: Cormini as the Persona, the console, desktop-pet and coopanion Worlds, Coo Pet
  * Provider (DeepSeek and the other model services Coo offers) and its `chatgpt` module (a ChatGPT plan,
@@ -533,7 +534,20 @@ export async function main(): Promise<void> {
       };
     },
   };
-  const bundled = [CONSOLE, DESKTOP_PET, NOTICE] as WorldDefinition<WorldSection>[];
+  const MONITOR = createMonitorDefinition({
+    ready: () => !guiding && (pet as DesktopPetWorld | null)?.petState().connected === true && core?.loop.getStatus().phase.state === 'idle',
+    show: async (text, options) => {
+      const target = pet as DesktopPetWorld | null;
+      if (!target?.petState().connected) return false;
+      const handle = target.dialog({ text, closable: true, ...(options?.acknowledge ? { input: { kind: 'buttons' as const, options: [{ label: options.acknowledge, primary: true }] } } : {}) });
+      const timer = setTimeout(() => handle.close(), 20000);
+      try {
+        const result = await handle.answer;
+        return !('unavailable' in result);
+      } finally { clearTimeout(timer); }
+    },
+  });
+  const bundled = [CONSOLE, DESKTOP_PET, NOTICE, MONITOR] as WorldDefinition<WorldSection>[];
 
   // extension providers must be registered before endpoints are resolved
   const extensions = await loadExtensions(repoRoot(), {
@@ -541,6 +555,7 @@ export async function main(): Promise<void> {
     reservedProviders: [...providerModules.map((m) => m.id), COO.id, CHATGPT_PROVIDER.id],
   });
   registerProviderModules([COO, CHATGPT_PROVIDER, ...extensions.providers]);
+  extensions.webUiAssets.push(...appWebUiAsset(MONITOR.id, fileURLToPath(new URL("../../coo-codex-monitor/packages/coopanion-world/src/", import.meta.url)), '0.2.0'));
   extensions.webUiAssets.push(...bundledWebUiAssets([
     { id: DESKTOP_PET.id, packageName: 'cortico-world-desktop-pet' },
   ]), ...appWebUiAsset(NOTICE_ID, join(APP_ROOT, 'build', 'panels', 'coopanion'), APP_VERSION));
