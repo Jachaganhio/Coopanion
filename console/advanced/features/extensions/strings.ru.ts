@@ -128,6 +128,7 @@ export const S: Partial<typeof en> = {
   versionConfirmBody: (name: string, current: string | null, target: string) => `${name}\n${current ?? 'Не установлено'} → ${target}\nЭто изменит общий пакет и затронет другие боты, которые его используют. Вступит в силу после перезапуска. Конфигурация и Memory сохраняются.`,
   linkNames: { npm: 'Пакет npm', repository: 'Репозиторий исходного кода', homepage: 'Сайт проекта', bugs: 'Сообщить о проблеме' },
   install: 'Установить',
+  installing: 'Установка…',
   alreadyInstalled: 'Установлено',
 
   npm: 'Из npm',

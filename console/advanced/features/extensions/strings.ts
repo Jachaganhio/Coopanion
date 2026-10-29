@@ -133,6 +133,7 @@ const zh = {
   versionConfirmBody: (name: string, current: string | null, target: string) => `${name}\n${current ?? '未安装'} → ${target}\n将修改共享安装包，使用它的其他 Bot 也会受到影响。重启进程后生效。配置和 Memory 保留。`,
   linkNames: { npm: 'npm 包页面', repository: '源代码仓库', homepage: '项目主页', bugs: '问题反馈' },
   install: '安装',
+  installing: '安装中…',
   alreadyInstalled: '已安装',
 
   npm: '从 npm 安装',
@@ -358,6 +359,7 @@ export const en: typeof zh = {
   versionConfirmBody: (name: string, current: string | null, target: string) => `${name}\n${current ?? 'Not installed'} → ${target}\nThis changes the shared package and affects other Bots using it. Takes effect after restart. Configuration and Memory are kept.`,
   linkNames: { npm: 'npm package', repository: 'Source repository', homepage: 'Project homepage', bugs: 'Report an issue' },
   install: 'Install',
+  installing: 'Installing…',
   alreadyInstalled: 'Installed',
 
   npm: 'From npm',

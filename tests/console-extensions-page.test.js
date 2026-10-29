@@ -300,6 +300,44 @@ describe('installation feedback', () => {
     await flush();
     return document.querySelector('.modal');
   }
+  it('shows pending and installed states in the open market drawer', async () => {
+    const list = structuredClone(LIST);
+    stub({ list, onInstall: () => list.extensions.push({ name: DETAIL.name, kind: 'world', version: DETAIL.version, state: 'pending-restart' }) });
+    const fetch = globalThis.fetch;
+    let finish;
+    vi.stubGlobal('fetch', async (url, init) => {
+      if (String(url) === '/api/extensions/install') await new Promise(resolve => { finish = resolve; });
+      return fetch(url, init);
+    });
+    const { root } = mount();
+    await flush();
+    const box = await detail(root);
+    button(box, '安装').click();
+    await flush();
+    const pending = box.querySelector('.extension-detail-install');
+    expect.soft(pending.textContent).toBe('安装中…');
+    expect.soft(pending.disabled).toBe(true);
+    expect.soft(box.querySelector('.extension-operation-feedback').textContent).toContain('正在安装');
+    expect.soft([...box.querySelectorAll('.extension-version-action')].every(button => button.disabled)).toBe(true);
+    finish();
+    await flush(80);
+    expect(box.querySelector('.extension-detail-install').textContent).toBe('已安装');
+    expect(box.querySelector('.extension-detail-install').disabled).toBe(true);
+    expect(box.querySelector('.extension-operation-feedback').textContent).toContain('安装成功');
+    expect(box.querySelector('.extension-operation-feedback').textContent).toContain('重启进程后生效');
+    expect(marketCards(root).textContent).toContain('已安装');
+  });
+  it.each([{ checkStatus: 400, error: '扩展实际类型为 provider' }, { installStatus: 400, error: 'pnpm add 退出码 1' }])('keeps the failure visible in the drawer and permits retry: $error', async ({ error, ...options }) => {
+    stub(options);
+    const { root } = mount();
+    await flush();
+    const box = await detail(root);
+    button(box, '安装').click();
+    await flush(80);
+    expect(box.querySelector('.extension-operation-feedback.bad')?.textContent).toContain(error);
+    expect(button(box, '安装').disabled).toBe(false);
+    expect([...box.querySelectorAll('.extension-version-action')].some(button => !button.disabled)).toBe(true);
+  });
   it('checks the category, installs the exact version and leaves feedback in the market', async () => {
     stub();
     const { root } = mount();

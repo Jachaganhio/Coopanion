@@ -122,6 +122,7 @@ export const S: Partial<typeof en> = {
   versionConfirmBody: (name: string, current: string | null, target: string) => `${name}\n${current ?? 'Nicht installiert'} → ${target}\nDas ändert das gemeinsame Paket und betrifft andere Bots, die es nutzen. Gilt nach dem Neustart. Konfiguration und Memory bleiben erhalten.`,
   linkNames: { npm: 'npm-Paket', repository: 'Quell-Repository', homepage: 'Projekt-Homepage', bugs: 'Problem melden' },
   install: 'Installieren',
+  installing: 'Wird installiert…',
   alreadyInstalled: 'Installiert',
 
   npm: 'Von npm',

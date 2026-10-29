@@ -122,6 +122,7 @@ export const S: Partial<typeof en> = {
   versionConfirmBody: (name: string, current: string | null, target: string) => `${name}\n${current ?? '설치 안 됨'} → ${target}\n공유 패키지가 바뀌므로 이를 쓰는 다른 봇도 영향을 받습니다. 재시작한 뒤 적용됩니다. 설정과 Memory는 유지됩니다.`,
   linkNames: { npm: 'npm 패키지 페이지', repository: '소스 저장소', homepage: '프로젝트 홈페이지', bugs: '문제 보고' },
   install: '설치',
+  installing: '설치 중…',
   alreadyInstalled: '설치됨',
 
   npm: 'npm에서 설치',

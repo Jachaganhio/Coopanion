@@ -1250,7 +1250,14 @@ export function mountExtensions(ctx: FeatureContext): void {
         const button = ui.button(isInstalled ? S.alreadyInstalled : S.install, { variant: 'primary', onClick: async () => {
           button.disabled = true;
           if (warnings.length && !await ui.confirm({ title: S.installWarningTitle, body: S.installWarningBody(data.name, warnings.map(id => `${marketIndex.tags[id].label}${S.labelSeparator}${plainHint(marketIndex.tags[id].hint)}`), listed?.note), danger: true })) { button.disabled = false; return; }
-          void operate('install', { name: data.name, version: data.version }, 'market', owner).finally(() => { if (box.isConnected) button.disabled = installed.some(item => item.name === data.name && item.state !== 'removed'); });
+          button.textContent = S.installing;
+          const done = operate('install', { name: data.name, version: data.version }, 'market', owner);
+          box.querySelectorAll<HTMLButtonElement>('.extension-version-action').forEach(button => { button.disabled = true; });
+          showDetailFeedback(box, states[owner].messages.market);
+          await done;
+          if (signal.aborted || !box.isConnected) return;
+          renderDetail(box, data, owner, hit);
+          showDetailFeedback(box, states[owner].messages.market);
         } });
         button.classList.add('extension-detail-install'); if (!isInstalled) button.prepend(icon(doc, 'download'));
         const os = listed?.os ?? data.os, osBlocked = !isInstalled && !osSupported(os);
@@ -1359,24 +1366,24 @@ export function mountExtensions(ctx: FeatureContext): void {
       columns.classList.toggle('is-split', indexed); box.closest('.modalcard')?.classList.toggle('extension-detail-card', indexed);
       if (indexed) { const side = ui.h('aside', 'extension-detail-side'); side.append(commentsSection(listed?.name ?? data.name, listed?.rating)); columns.append(side); }
   }
+  function showDetailFeedback(box: HTMLElement, note: { text: string; bad: boolean } | undefined) {
+    const feedback = box.querySelector<HTMLElement>('.extension-operation-feedback');
+    if (feedback && note) { feedback.textContent = note.text; feedback.classList.toggle('bad', note.bad); }
+  }
   /** 历史版本走与市场安装相同的 check → install;结果同时写进抽屉。 */
   async function installRelease(box: HTMLElement, data: PackageDetailView, version: string, owner: Category, hit?: SearchHitView, item?: ExtensionView) {
     const current = installed.find(entry => entry.name === data.name && entry.state !== 'removed');
     if (busy.has(data.name) || !await ui.confirm({ title: S.versionConfirmTitle, body: S.versionConfirmBody(data.name, current?.installedVersion ?? current?.version ?? null, version), danger: true })) return;
     if (signal.aborted || busy.has(data.name)) return;
-    const show = (note: { text: string; bad: boolean } | undefined) => {
-      const feedback = box.querySelector<HTMLElement>('.extension-operation-feedback');
-      if (feedback && note) { feedback.textContent = note.text; feedback.classList.toggle('bad', note.bad); }
-    };
     const done = operate('install', { name: data.name, version }, 'management', owner);
     box.querySelectorAll<HTMLButtonElement>('.extension-version-action').forEach(button => { button.disabled = true; });
-    show(states[owner].messages.management);
+    showDetailFeedback(box, states[owner].messages.management);
     await done;
     const result = states[owner].messages.management;
     await checkUpdates();
     if (signal.aborted || !box.isConnected) return;
     renderDetail(box, data, owner, hit, item && installed.find(entry => entry.name === data.name && entry.state !== 'removed'));
-    show(result);
+    showDetailFeedback(box, result);
   }
   /** `toComments`:打开后滚到评论区(从卡片上的评论数点进来)。 */
   function openDetail(hit: SearchHitView, owner: Category, toComments = false) {

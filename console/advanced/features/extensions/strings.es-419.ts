@@ -122,6 +122,7 @@ export const S: Partial<typeof en> = {
   versionConfirmBody: (name: string, current: string | null, target: string) => `${name}\n${current ?? 'No instalada'} → ${target}\nEsto cambia el paquete compartido y afecta a otros Bots que lo usan. Surte efecto después de reiniciar. La configuración y Memory se conservan.`,
   linkNames: { npm: 'Paquete npm', repository: 'Repositorio de código fuente', homepage: 'Página del proyecto', bugs: 'Informar un problema' },
   install: 'Instalar',
+  installing: 'Instalando…',
   alreadyInstalled: 'Instalada',
 
   npm: 'Desde npm',

@@ -122,6 +122,7 @@ export const S: Partial<typeof en> = {
   versionConfirmBody: (name: string, current: string | null, target: string) => `${name}\n${current ?? '未安裝'} → ${target}\n將修改共用安裝套件，使用它的其他 Bot 也會受到影響。重新啟動處理程序後生效。設定和 Memory 保留。`,
   linkNames: { npm: 'npm 套件頁面', repository: '原始碼儲存庫', homepage: '專案首頁', bugs: '問題回報' },
   install: '安裝',
+  installing: '安裝中…',
   alreadyInstalled: '已安裝',
 
   npm: '從 npm 安裝',

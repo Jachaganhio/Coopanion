@@ -174,7 +174,7 @@ Windows、macOS 和 Linux（deb、AppImage）的标题栏整条使用统一的�
 
 高级模式的「模型」页可以换模型和调整思考档位、新建「OpenAI Responses Compatible」连接接入其他兼容 Responses API 的服务，以及为没有内置价目的服务填写价目。
 
-**扩展**：高级模式的「扩展」页列出 npm 上带 `cortico-world` 关键字的 World；收录在[官方索引](https://github.com/Pal-AI-Lab/cortico-extensions)里的包还显示标签、投票和评论。安装后点「重启进程」，再到「World 总览」里启用。
+**扩展**：高级模式的「扩展」页列出 npm 上带 `cortico-world` 关键字的 World；收录在[官方索引](https://github.com/Pal-AI-Lab/cortico-extensions)里的包还显示标签、投票和评论。安装按钮显示「安装中…」，成功后变为「已安装」；安装错误显示在扩展详情中。安装后点「重启进程」，再到「World 总览」里启用。
 
 **更新**：Windows 安装版和 AppImage 会在后台下载新版本，下好后 Coo 会询问是否重启更新，选择「下次再说」则在退出应用时安装。关闭「习惯 → 通用 → 自动更新」后停止检查、取消正在进行的下载，已下载的更新也不再安装。Mac 版、deb 和 Windows 便携版在有新版本时，标题栏版本号右侧会出现手动下载的链接。Steam 版由 Steam 更新。
 

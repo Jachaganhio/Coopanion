@@ -122,6 +122,7 @@ export const S: Partial<typeof en> = {
   versionConfirmBody: (name: string, current: string | null, target: string) => `${name}\n${current ?? '未インストール'} → ${target}\n共有パッケージが変更され、これを使っている他のボットにも影響します。再起動後に反映されます。設定と Memory は保持されます。`,
   linkNames: { npm: 'npm パッケージページ', repository: 'ソースリポジトリ', homepage: 'プロジェクトのホームページ', bugs: '問題を報告' },
   install: 'インストール',
+  installing: 'インストール中…',
   alreadyInstalled: 'インストール済み',
 
   npm: 'npm からインストール',

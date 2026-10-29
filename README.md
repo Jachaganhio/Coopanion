@@ -174,7 +174,7 @@ Click the tray icon, or right-click Coo and click the gear. **Normal mode** show
 
 The Model page in advanced mode changes the model and reasoning effort, adds an "OpenAI Responses Compatible" connection for any other service that speaks the Responses API, and takes prices for services without built-in ones.
 
-**Extensions**: the Extensions page in advanced mode lists Worlds on npm with the `cortico-world` keyword; packages in the [official index](https://github.com/Pal-AI-Lab/cortico-extensions) also show tags, votes and comments. After installing, click **Restart process** and enable the World in **World Overview**.
+**Extensions**: the Extensions page in advanced mode lists Worlds on npm with the `cortico-world` keyword; packages in the [official index](https://github.com/Pal-AI-Lab/cortico-extensions) also show tags, votes and comments. The install button shows progress and changes to **Installed** after success; installation errors appear in the extension details. After installing, click **Restart process** and enable the World in **World Overview**.
 
 **Updates**: the Windows installer build and the AppImage download new versions in the background, and Coo asks whether to restart and update; choosing **Later** installs it when you quit. Turning off **Habits → General → Automatic updates** stops the checks, cancels a download under way and keeps a downloaded update from installing. On Mac, with the deb and with the Windows portable build, the update status beside the version in the title bar links to a newer release to download by hand. Steam updates the Steam build.
 
