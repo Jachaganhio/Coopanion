@@ -4,4 +4,3 @@ export function taskNotice(source:string,event:string,taskId:string,summary?:str
 }
 
 export const TASK_QUERY_DESCRIPTION='Read last observed local Codex and Claude Code states. Running means recent evidence, not guaranteed current liveness. Never infer completion from silence.';
-export const TASK_QUERY_SUMMARY='Read observed local Codex and Claude Code tasks.';

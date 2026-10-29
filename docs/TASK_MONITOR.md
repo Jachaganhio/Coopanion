@@ -6,9 +6,9 @@ The optional task-monitor World is developed, tested and packaged in this Coopan
 
 ## Release routes
 
-- **Plugin package:** run `pnpm run pack:monitor`; distribute `dist/cortico-world-codex-monitor-0.2.2.zip` and `.tgz` as assets in this fork's GitHub Releases. A plugin-specific tag such as `task-monitor-v0.2.2` keeps plugin releases distinct from the application's upstream tags.
+- **Plugin package:** run `pnpm run pack:monitor`; distribute `dist/cortico-world-codex-monitor-0.2.3.zip` and `.tgz` as assets in this fork's GitHub Releases. A plugin-specific tag such as `task-monitor-v0.2.3` keeps plugin releases distinct from the application's upstream tags.
 - **Extension market:** publish this package to npm. The official index [Pal-AI-Lab/cortico-extensions](https://github.com/Pal-AI-Lab/cortico-extensions) documents npm as the extension source. A `[sync] cortico-world-codex-monitor` issue requests immediate catalog refresh after publication. Tag or certification changes are separate maintainer requests. A market listing does not require moving the source into another repository.
-- **Upstream PR:** propose the optional World and host assembly to `Pal-AI-Lab/Coopanion`. This makes the direct, model-free bubble sink available as part of the host. Acceptance is an upstream product decision: current `docs/DEVELOPMENT.md` reserves ordinary app UI for bound Worlds, while third-party Worlds use model events or their own environment. No vendor/Cortico modification is included.
+- **Host compatibility:** the market package uses the public World event and panel contracts. Installing it in upstream Coopanion requires no host changes; Coo decides whether and how to show model-mode notifications.
 
 Build and tests create local artifacts. npm publication, GitHub releases and upstream review are separate release actions.
 

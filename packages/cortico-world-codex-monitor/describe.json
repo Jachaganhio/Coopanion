@@ -2,23 +2,23 @@
   "tools": [
     {
       "name": "codex_tasks",
-      "description": "Read observed local Codex and Claude Code task states.",
+      "description": "Read last observed local Codex and Claude Code states. Running means recent evidence, not guaranteed current liveness. Never infer completion from silence.",
+      "tags": [
+        "read"
+      ],
       "parameters": {
         "type": "object",
         "properties": {},
         "additionalProperties": false
-      },
-      "tags": [
-        "read"
-      ]
+      }
     }
   ],
   "events": [
     {
       "type": "codex-monitor.notice",
       "description": {
-        "en": "An observed Codex or Claude Code task transition.",
-        "zh": "明确观察到的 Codex 或 Claude Code 任务变化。"
+        "zh": "明确观察到的 Codex 或 Claude Code 任务变化。",
+        "en": "An observed Codex or Claude Code task transition."
       }
     }
   ]

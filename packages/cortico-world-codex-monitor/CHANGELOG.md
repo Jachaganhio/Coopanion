@@ -1,5 +1,11 @@
 # Changelog (`package.json`)
 
+## 0.2.3
+
+- Prepare the standalone npm package for the extension market with application, extra-setup, experimental and private-data tags.
+- Align the packaged tool self-description with the runtime declaration.
+- Document market installation and clarify that Coo decides the final wording and delivery of model notifications.
+
 ## 0.2.2
 
 - Pin Codex rollout ownership to the first session header and exclude internally attributed turns, including copied parent history in subagent logs.

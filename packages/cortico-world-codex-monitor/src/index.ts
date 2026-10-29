@@ -1,6 +1,6 @@
 import { notificationSentence, summarizeAnswer } from './engine/summary.ts';
 import { strings } from './strings.ts';
-import { taskNotice, TASK_QUERY_DESCRIPTION, TASK_QUERY_SUMMARY } from './model-text.ts';
+import { taskNotice, TASK_QUERY_DESCRIPTION } from './model-text.ts';
 import { LocalClient } from './local.ts';
 import { settings } from './settings.ts';
 import { join } from 'node:path';
@@ -72,6 +72,6 @@ export function createMonitorDefinition(sink?:BubbleSink){return {
   defaults:():Config=>({enabled:false,connectionFile:'',collection:'local',codexHome:'',claudeHome:'',claudeDesktopHome:'',includeProjects:false,mode:sink?'status':'model',notifyStarted:true,notifyConnected:true}),
   preflight:(ctx:Context)=>{if(ctx.cfg.collection==='bridge' && !ctx.cfg.connectionFile)throw new Error(`${strings().error}: connectionFile`);},
   create:(ctx:Context)=>new MonitorWorld(ctx.cfg,ctx.dataDir,sink),
-  describe:{tools:[{name:'codex_tasks',description:TASK_QUERY_SUMMARY,tags:['read'] as const,parameters:{type:'object',properties:{},additionalProperties:false}}],events:[{type:'codex-monitor.notice',description:{zh:'明确观察到的 Codex 或 Claude Code 任务变化。',en:'An observed Codex or Claude Code task transition.'}}]},
+  describe:{tools:[{name:'codex_tasks',description:TASK_QUERY_DESCRIPTION,tags:['read'] as const,parameters:{type:'object',properties:{},additionalProperties:false}}],events:[{type:'codex-monitor.notice',description:{zh:'明确观察到的 Codex 或 Claude Code 任务变化。',en:'An observed Codex or Claude Code task transition.'}}]},
 };}
 export default createMonitorDefinition();
